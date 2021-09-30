@@ -1,5 +1,13 @@
+const httpServer = require("http").createServer();
 const mongo = require('mongodb').MongoClient;
-const client = require('socket.io')(4000).sockets;
+const client = require('socket.io')(httpServer).sockets;
+const express = require("express");
+
+const app = express();
+
+const http = require("http").createServer(app);
+
+const PORT = process.env.PORT || 3000;
 
 // Connect to mongo
 mongo.connect('mongodb://127.0.0.1/mongochat', function(err, db){
@@ -60,4 +68,13 @@ mongo.connect('mongodb://127.0.0.1/mongochat', function(err, db){
             });
         });
     });
+});
+http.listen(PORT, () => {
+    console.log(`Listening on port ${PORT}`);
+});
+
+app.use(express.static(__dirname + '/public'));
+
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/index.html');
 });
